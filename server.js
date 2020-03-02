@@ -93,6 +93,27 @@ router.post('/signin', function(req, res) {
     }
 });
 
+router.get('/movies', function(req, res) {
+    var movie = db.find(req.body.movie);
+
+    if (!movie) {
+        res.status(401).send({success: false, msg: 'Movie does not exist in the database'});
+    }
+    else {
+        res.json({success: true, movie: movie});
+    }
+});
+
+router.post('/movies', function(req, res) {
+    if (!req.body.movie) {
+        res.json({success: false, msg: 'Please pass a movie name'})
+    }
+    else {
+        db.save(req.body.movie);
+        res.json({success: true, msg: 'Movie posted successfuly'})
+    }
+});
+
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
 
