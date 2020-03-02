@@ -18,10 +18,10 @@ module.exports = function () {
         /*
          * Retrieve a movie with a given id or return all the movies if the id is undefined.
          */
-        find: function (id) {
+        find: function (movie) {
             if (id) {
                 return this.userList.find(function (element) {
-                    return element.id === id;
+                    return element.movie === movie;
                 });
             }
             else {
@@ -41,14 +41,14 @@ module.exports = function () {
         /*
          * Delete a movie with the given id.
          */
-        remove: function (id) {
+        remove: function (movie) {
             var found = 0;
             this.userList = this.userList.filter(function (element) {
-                if (element.id === id) {
+                if (element.movie === movie) {
                     found = 1;
                 }
                 else {
-                    return element.id !== id;
+                    return element.movie !== movie;
                 }
             });
             return found;
@@ -56,9 +56,9 @@ module.exports = function () {
         /*
          * Update a movie with the given id
          */
-        update: function (id, user) {
+        update: function (movie, user) {
             var userIndex = this.userList.findIndex(function (element) {
-                return element.id === id;
+                return element.movie === movie;
             });
             if (userIndex !== -1) {
                 this.userList[userIndex].username = user.username;

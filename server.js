@@ -114,6 +114,41 @@ router.post('/movies', function(req, res) {
     }
 });
 
+router.put('/movies', function(req, res) {
+    var user = db.findOne(req.body.username);
+
+    if (!user) {
+        res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});
+    }
+    else {
+        // check if password matches
+        if (req.body.password === user.password)  {
+            var userToken = { id : user.id, username: user.username };
+            var token = jwt.sign(userToken, process.env.UNIQUE_KEY);
+            db.save(movie);
+            res.json({success: true, msg: 'Movie deleted', token: 'JWT ' + token});
+        }
+        else {
+            res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
+        }
+    }
+});
+
+router.delete('/movies', function(req, res) {
+    var auth = authController.isAuthenticated();
+
+    if (!req.body.username || !req.body.password) {
+        res.json({success: false, msg: 'Please pass username and password.'});
+    }
+    else if (!auth) {
+        res.json({success: false, msg: 'Authentication failed.'});
+    }
+    else {
+        db.remove(req.body.movie);
+        res.json({success: true, msg: 'Successfully deleted movie.'});
+    }
+});
+
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
 
