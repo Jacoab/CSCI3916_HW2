@@ -1,6 +1,6 @@
-/**
- * Created by shawnmccarthy on 1/22/17.
- */
+/*
+* Created by shawnmccarthy on 1/22/17.
+*/
 'use strict;';
 //Include crypto to generate the movie id
 var crypto = require('crypto');
@@ -18,10 +18,10 @@ module.exports = function () {
         /*
          * Retrieve a movie with a given id or return all the movies if the id is undefined.
          */
-        find: function (movie) {
+        find: function (id) {
             if (id) {
                 return this.userList.find(function (element) {
-                    return element.movie === movie;
+                    return element.id === id;
                 });
             }
             else {
@@ -41,14 +41,14 @@ module.exports = function () {
         /*
          * Delete a movie with the given id.
          */
-        remove: function (movie) {
+        remove: function (id) {
             var found = 0;
             this.userList = this.userList.filter(function (element) {
-                if (element.movie === movie) {
+                if (element.id === id) {
                     found = 1;
                 }
                 else {
-                    return element.movie !== movie;
+                    return element.id !== id;
                 }
             });
             return found;
@@ -56,9 +56,9 @@ module.exports = function () {
         /*
          * Update a movie with the given id
          */
-        update: function (movie, user) {
+        update: function (id, user) {
             var userIndex = this.userList.findIndex(function (element) {
-                return element.movie === movie;
+                return element.id === id;
             });
             if (userIndex !== -1) {
                 this.userList[userIndex].username = user.username;
