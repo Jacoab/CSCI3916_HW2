@@ -6,7 +6,7 @@ passport.use(new BasicStrategy(
     function(username, password, done) {
         //hard coded
         var user = { name: "testuser" };
-        if (username == user.name && password == "cu")
+        if (username == user.name && password == "1")
         {
             return done(null, user);
         }
