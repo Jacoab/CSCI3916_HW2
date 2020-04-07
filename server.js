@@ -93,61 +93,67 @@ router.post('/signin', function(req, res) {
     }
 });
 
-router.get('/movies', function(req, res) {
-    var movie = db.find(req.body.movie);
+router.route('/movies')
+    .get(function(req, res) {
+        var movie = db.find(req.body.movie.id);
 
-    if (!movie) {
-        res.status(401).send({success: false, msg: 'Movie does not exist in the database'});
-    }
-    else {
-        res.json({success: true, movie: movie});
-    }
-});
-
-router.post('/movies', function(req, res) {
-    if (!req.body.movie) {
-        res.json({success: false, msg: 'Please pass a movie name'})
-    }
-    else {
-        db.save(req.body.movie);
-        res.json({success: true, msg: 'Movie posted successfuly'})
-    }
-});
-
-router.put('/movies', function(req, res) {
-    var user = db.findOne(req.body.username);
-
-    if (!user) {
-        res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});
-    }
-    else {
-        // check if password matches
-        if (req.body.password === user.password)  {
-            var userToken = { id : user.id, username: user.username };
-            var token = jwt.sign(userToken, process.env.UNIQUE_KEY);
-            db.save(movie);
-            res.json({success: true, msg: 'Movie deleted', token: 'JWT ' + token});
+        if (!movie) {
+            res.status(401).send({success: false, msg: 'Movie does not exist in the database'});
         }
         else {
-            res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
+            res.json({success: true, movie: movie});
         }
-    }
-});
+    })
+    .post(function(req, res) {
+        if (!req.body.movie) {
+            res.json({success: false, msg: 'Please pass a movie name'})
+        }
+        else {
+            db.save(req.body.movie);
+            res.json({success: true, msg: 'Movie posted successfully'})
+        }
+    })
+    .put(authJwtController.isAuthenticated, function(req, res) {
+        if (!req.body.movie) {
+            res.json({success: false, msg: 'Please pass a movie name'})
+        }
+        else {
+            db.update(req.body.movie.id, req.body.user);
+            res.json({success: true, msg: 'Movie updated successfully'})
+        }
+    })
+    .delete(authController.isAuthenticated(), function(req, res) {
+        if (!req.body.username || !req.body.password) {
+            res.json({success: false, msg: 'Please pass username and password.'});
+        }
+        else {
+            db.remove(req.body.movie);
+            res.json({success: true, msg: 'Successfully deleted movie.'});
+        }
+    });
+/*
+    .put(authJwtController.isAuthenticated, function(req, res) {
+        var user = db.findOne(req.body.username);
 
-router.delete('/movies', function(req, res) {
-    var auth = authController.isAuthenticated();
+        if (!user) {
+            res.status(401).send({success: false, msg: 'Authentication failed. User not found.'});
+        }
+        else {
+            // check if password matches
+            if (req.body.password === user.password)  {
+                var userToken = { id : user.id, username: user.username };
+                var token = jwt.sign(userToken, process.env.UNIQUE_KEY);
+                db.save(movie);
+                res.json({success: true, msg: 'Movie deleted', token: 'JWT ' + token});
+            }
+            else {
+                res.status(401).send({success: false, msg: 'Authentication failed. Wrong password.'});
+            }
+        }
+    })
 
-    if (!req.body.username || !req.body.password) {
-        res.json({success: false, msg: 'Please pass username and password.'});
-    }
-    else if (!auth) {
-        res.json({success: false, msg: 'Authentication failed.'});
-    }
-    else {
-        db.remove(req.body.movie);
-        res.json({success: true, msg: 'Successfully deleted movie.'});
-    }
-});
+ */
+
 
 app.use('/', router);
 app.listen(process.env.PORT || 8080);
